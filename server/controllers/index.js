@@ -2,12 +2,12 @@
 const models = require('../models');
 
 const hostIndex = (req, res) => {
-  let name = 'unknown';
+  const name = 'unknown';
 
   res.render('index', {
     currentName: name,
     title: 'Home',
-    pageName: 'Home Page'
+    pageName: 'Home Page',
   });
 };
 
@@ -31,7 +31,6 @@ const setName = (req, res) => {
   if (!req.body.firstname || !req.body.lastname || !req.body.beds) {
     return res.status(400).json({ error: 'firstname, lastname and beds are all required' });
   }
-  
 };
 
 const searchName = (req, res) => {
@@ -41,7 +40,7 @@ const searchName = (req, res) => {
 };
 
 const updateLast = (req, res) => {
-	
+
 };
 
 const notFound = (req, res) => {

@@ -9,7 +9,14 @@ const expressHandlebars = require('express-handlebars');
 const router = require('./router.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
+const theDBConnectionString = process.env.MONGODB_URI || 'mongodb://localhost/simpleMVCExample';
 
+mongoose.connect(theDBConnectionString).catch((err) => {
+  if (err) {
+    console.log('Error connecting to database');
+    throw err;
+  }
+});
 
 const app = express();
 
@@ -35,4 +42,3 @@ app.listen(port, (err) => {
   }
   console.log(`Listening on port ${port}`);
 });
-
