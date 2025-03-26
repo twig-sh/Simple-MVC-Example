@@ -14,6 +14,8 @@ const router = (app) => {
   app.post('/setName', controllers.setName);
 
   app.post('/updateLast', controllers.updateLast);
+
+  app.post('/cat', controllers.makeCat);
 };
 
 // export the router function

@@ -1,5 +1,6 @@
 // pull in our models. This will automatically load the index.js from that folder
 const models = require('../models');
+const { Cat } = models;
 
 const hostIndex = (req, res) => {
   const name = 'unknown';
@@ -49,6 +50,24 @@ const notFound = (req, res) => {
   });
 };
 
+const makeCat = async (req, res) => {
+  if (!req.body.firstName || !req.body.lastName) {
+    return res.status(400).json({
+      error: 'give me firstName and lastName dummy',
+    });
+  }
+
+  const catData = {
+    name: `${req.body.firstName} ${req.body.lastName}`,
+    bedsOwned: req.body.beds,
+  };
+
+  const newCat = new Cat(catData);
+
+  await newCat.save();
+  return res.status(201).json(catData);
+};
+
 module.exports = {
   index: hostIndex,
   page1: hostPage1,
@@ -59,4 +78,5 @@ module.exports = {
   updateLast,
   searchName,
   notFound,
+  makeCat,
 };
