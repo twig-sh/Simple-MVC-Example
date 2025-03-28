@@ -1,5 +1,6 @@
 // pull in our models. This will automatically load the index.js from that folder
 const models = require('../models');
+
 const { Cat } = models;
 
 const hostIndex = (req, res) => {
@@ -32,12 +33,14 @@ const setName = (req, res) => {
   if (!req.body.firstname || !req.body.lastname || !req.body.beds) {
     return res.status(400).json({ error: 'firstname, lastname and beds are all required' });
   }
+  return null;
 };
 
 const searchName = (req, res) => {
   if (!req.query.name) {
     return res.status(400).json({ error: 'Name is required to perform a search' });
   }
+  return null;
 };
 
 const updateLast = (req, res) => {
@@ -64,8 +67,57 @@ const makeCat = async (req, res) => {
 
   const newCat = new Cat(catData);
 
-  await newCat.save();
-  return res.status(201).json(catData);
+  try {
+    await newCat.save();
+    return res.status(201).json(catData);
+  } catch (e) {
+    console.log('yow!');
+    return res.status(500).json({
+      error: 'failed to create cat',
+    });
+  }
+};
+
+const getCat = async (req, res) => {
+  const cats = await Cat.findOne({
+    name: 'Methuselah Johnson',
+  }, 'name bedsOwned').lean().exec();
+
+  console.log(cats);
+
+  return res.status(200).json(cats);
+};
+
+const getAllCats = async (req, res) => {
+  try {
+    const cats = await Cat.findOne({}).lean().exec();
+
+    console.log(cats);
+
+    return res.status(200).json(cats);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: 'Error finding cats',
+    });
+  }
+};
+
+const updateCat = async (req, res) => {
+  if (!req.body.name && !req.body.bedsOwned) {
+    return res.status(400).json({
+      error: 'must provide name or bedsowned',
+    });
+  }
+
+  const cat = await Cat.find({
+    $or: [
+      { name: req.body.name },
+      { bedOwned: req.body.bedOwned },
+    ],
+  });
+
+  return res.status(200).json({});
 };
 
 module.exports = {
@@ -79,4 +131,7 @@ module.exports = {
   searchName,
   notFound,
   makeCat,
+  getCat,
+  getAllCats,
+  updateCat,
 };

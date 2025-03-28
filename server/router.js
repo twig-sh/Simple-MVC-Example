@@ -9,13 +9,16 @@ const router = (app) => {
 
   app.get('/', controllers.index);
 
-  app.get('/*', controllers.notFound);
-
   app.post('/setName', controllers.setName);
 
   app.post('/updateLast', controllers.updateLast);
 
   app.post('/cat', controllers.makeCat);
+  app.get('/cat', controllers.getCat);
+  app.put('/cat', controllers.updateCat);
+  app.get('/allCats', controllers.getAllCats);
+
+  app.get('/*', controllers.notFound);
 };
 
 // export the router function
