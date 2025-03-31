@@ -15,9 +15,33 @@
   {{#if cats}}
     <ul>
       {{#each cats}}
-        <li> {{this.name}} has {{this.bedsOwned}} beds. </li>
+        <li> 
+          {{this.name}} has {{this.bedsOwned}} beds.
+          <button class="delete-button" data-id="{{this._id}}">Delete</button>
+        </li>
       {{/each}}
     </ul>
   {{/if}}
+
+  <script>
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const button = e.currentTarget;
+        console.log(button.dataset.id);
+        const catId = button.dataset.id;
+
+        const response = await fetch(`/cat/${catId}`, {
+          method: 'DELETE',
+        })
+
+        if (response.ok) {
+          button.closest('li').remove();
+        } else {
+          console.error("oops, didn't delete");
+        }
+      });
+    })
+  </script>
 </body>
 </html>

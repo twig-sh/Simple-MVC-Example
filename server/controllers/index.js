@@ -3,6 +3,10 @@ const models = require('../models');
 
 const { Cat } = models;
 
+const queryAllCats = async () => {
+  return await Cat.find().lean().exec();
+};
+
 const hostIndex = (req, res) => {
   const name = 'unknown';
 
@@ -13,8 +17,20 @@ const hostIndex = (req, res) => {
   });
 };
 
-const hostPage1 = (req, res) => {
-
+const hostPage1 = async (req, res) => {
+  try {
+    const cats = await queryAllCats();
+    res.render('page1', {
+      cats,
+      title: 'Page 1',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('page1', {
+      title: 'Page 1',
+      error: 'Failed to load',
+    });
+  }
 };
 
 const hostPage2 = (req, res) => {
@@ -90,7 +106,7 @@ const getCat = async (req, res) => {
 
 const getAllCats = async (req, res) => {
   try {
-    const cats = await Cat.findOne({}).lean().exec();
+    const cats = await queryAllCats();
 
     console.log(cats);
 
@@ -104,20 +120,69 @@ const getAllCats = async (req, res) => {
 };
 
 const updateCat = async (req, res) => {
-  if (!req.body.name && !req.body.bedsOwned) {
+  const { id } = req.params;
+
+  if (!id) {
     return res.status(400).json({
-      error: 'must provide name or bedsowned',
+      error: 'must provide id',
     });
   }
 
-  const cat = await Cat.find({
-    $or: [
-      { name: req.body.name },
-      { bedOwned: req.body.bedOwned },
-    ],
-  });
+  if (!req.body.name && !req.body.bedsOwned) {
+    return res.status(400).json({
+      error: 'must provide name or bedsOwned',
+    });
+  }
 
-  return res.status(200).json({});
+  const cat = await Cat.findById(id);
+
+  if (!cat) {
+    return res.status(404).json({
+      error: 'Cat not found',
+    });
+  }
+
+  try {
+    cat.name = req.body.name;
+    cat.bedsOwned = req.body.bedsOwned;
+
+    await cat.save();
+    return res.status(200).json(cat);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: 'failed to update cat',
+    });
+  }
+};
+
+const deleteCat = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({
+      error: 'must provide id',
+    });
+  }
+
+  try {
+    const cat = await Cat.findById(id);
+
+    if (!cat) {
+      return res.status(404).json({
+        error: 'Cat not found',
+      });
+    }
+
+    await cat.deleteOne();
+
+    return res.status(200);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: 'failed to delete cat',
+    });
+  }
 };
 
 module.exports = {
@@ -134,4 +199,5 @@ module.exports = {
   getCat,
   getAllCats,
   updateCat,
+  deleteCat,
 };

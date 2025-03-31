@@ -13,10 +13,11 @@ const router = (app) => {
 
   app.post('/updateLast', controllers.updateLast);
 
-  app.post('/cat', controllers.makeCat);
   app.get('/cat', controllers.getCat);
-  app.put('/cat', controllers.updateCat);
   app.get('/allCats', controllers.getAllCats);
+  app.post('/cat', controllers.makeCat);
+  app.put('/cat/:id', controllers.updateCat);
+  app.delete('/cat/:id', controllers.deleteCat);
 
   app.get('/*', controllers.notFound);
 };
